@@ -2,6 +2,7 @@
 import RPi.GPIO as GPIO
 import sys
 import time
+import datetime
 
 #Script to "Press Buttons" on Westinghouse Outlet Remote. Used in conjunction with HABRIDGE
 
@@ -17,6 +18,16 @@ import time
 #numbers 1,2,3 to be used rather than forcing user to shift to 0,1,2 based on array position.
 BUTTON = int(sys.argv[1])-1
 STATE = int(sys.argv[2])
+try:
+  MEMO = str(sys.argv[3])
+except Exception:
+  MEMO = ""
+  sys.exc_clear()
+
+#('button %s' % BUTTON)
+
+target = open("/home/pi/basic_onoff.log", 'a')
+target.write(str(datetime.datetime.now()) + " Received request for Button: " + str(BUTTON+1) + " State:" + str(STATE) + " " + MEMO + "\n")
 
 #Assign Button Matrix Wires to RaspberryPi Pins using BOARD numbering
 #  Other GPIO pins could have been used but these are the ones I chose to keep the
@@ -30,7 +41,7 @@ STATE = int(sys.argv[2])
 
 SW=[38,35,36,37]
 ST=[33,40]
-PRESS_TIME = 0.75
+PRESS_TIME = 0.95
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)  ##Use board pin numbers
@@ -54,4 +65,3 @@ def releaseButtons():
 GPIO.setup(SW[BUTTON], GPIO.OUT, initial=0)
 GPIO.setup(ST[STATE], GPIO.OUT, initial=0)
 releaseButtons()
-
